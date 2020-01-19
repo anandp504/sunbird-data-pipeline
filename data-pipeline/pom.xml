@@ -36,6 +36,7 @@
 		<module>assessment-aggregator</module>
         <module>user-cache-updater</module>
 		<module>content-cache-updater</module>
+		<module>de-duplication-flink</module>
 	</modules>
 
 	<properties>
@@ -43,6 +44,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<samza.version>0.14.1</samza.version>
 		<scala.version>2.11</scala.version>
+		<scala.maj.version>2.11.12</scala.maj.version>
 		<kafka.version>1.1.0</kafka.version>
 		<jackson-jaxrs.version>1.9.13</jackson-jaxrs.version>
 		<samza.log.dir>/tmp</samza.log.dir>
