@@ -42,12 +42,12 @@ rm /usr/local/bin/kubectl
 brew link --overwrite kubernetes-cli
 
 # Create a configmap using the flink-configuration-configmap.yaml
-kubectl create -f flink-configuration-configmap.yaml
+kubectl create -f sunbird-data-pipeline/kubernetes/flink-configuration-configmap.yaml
 
 # Create pods for jobmanager-service, job-manager and task-manager using the yaml files
-kubectl create -f jobmanager-service.yaml
-kubectl create -f jobmanager-deployment.yaml
-kubectl create -f taskmanager-deployment.yaml
+kubectl create -f sunbird-data-pipeline/kubernetes/jobmanager-service.yaml
+kubectl create -f sunbird-data-pipeline/kubernetes/jobmanager-deployment.yaml
+kubectl create -f sunbird-data-pipeline/kubernetes/taskmanager-deployment.yaml
 
 # Create a port-forwarding for accessing the job-manager UI on localhost:8081
 kubectl port-forward deployment/flink-jobmanager 8081:8081
