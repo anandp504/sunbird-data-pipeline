@@ -1,42 +1,53 @@
 package org.ekstep.dp.flink
 
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import org.apache.flink.api.common.functions.MapFunction
-import org.apache.flink.streaming.api.datastream.DataStream
+import org.apache.flink.api.common.typeinfo.TypeInformation
+import org.apache.flink.api.java.typeutils.TypeExtractor
+import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
-import org.ekstep.ep.samza.domain.Event
-import java.{util => ju}
-
+import org.apache.flink.streaming.api.scala.OutputTag
+import org.ekstep.dp.functions.DuplicateEventMonitor
 import org.ekstep.dp.task.BaseFlinkTask
-import org.ekstep.ep.samza.serializer.EventsSerializer
 
+class DeduplicationFlinkTask(config: DeduplicationConfig) extends BaseFlinkTask(config) {
 
-object DeduplicationFlinkTask extends App with BaseFlinkTask[Event] {
+  private val serialVersionUID = 146697324640926024L
 
-  class EventMapProjection extends MapFunction[String, Event] {
-    override def map(messageEnvelope: String): Event = {
-      val gson = new Gson()
-      val mapType = new TypeToken[ju.HashMap[String, Object]] {}.getType
-      val jsonMap = gson.fromJson[ju.HashMap[String, Object]](messageEnvelope, mapType)
-      println("JSON Map: " + jsonMap)
-      new Event(jsonMap)
+  def process() = {
+
+    implicit val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
+    implicit val v3EventTypeInfo: TypeInformation[String] = TypeExtractor.getForClass(classOf[String])
+    env.enableCheckpointing(config.checkpointingInterval)
+
+    try {
+      val kafkaConsumer = createStreamConsumer(config.taskInputTopics)
+      kafkaConsumer.setStartFromEarliest()
+
+      val dataStream: SingleOutputStreamOperator[String] =
+        env.addSource(kafkaConsumer, "kafka-telemetry-valid-consumer")
+          .process(new DuplicateEventMonitor(config))
+
+      dataStream.getSideOutput(new OutputTag[String]("unique-event"))
+        .addSink(createStreamProducer(config.taskOutputSuccessTopic))
+        .name("kafka-telemetry-unique-producer")
+
+      // duplicateStream.getSideOutput(new OutputTag[V3Event]("duplicate-event")).print()
+      dataStream.getSideOutput(new OutputTag[String]("duplicate-event"))
+        .addSink(createStreamProducer(config.kafkaDuplicateTopic))
+        .name("kafka-telemetry-duplicate-producer")
+
+      env.execute("DeduplicationFlinkJob")
+    } catch {
+      case ex: Exception =>
+        ex.printStackTrace()
     }
   }
 
-  override def main(args: Array[String]) = {
-
-    implicit val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
-    env.getConfig.registerTypeWithKryoSerializer(classOf[Event], classOf[EventsSerializer])
-
-    val kafkaConsumer = createStreamConsumer()
-    val dataStream: DataStream[Event] =
-      env.addSource(kafkaConsumer, "kafka-telemetry-valid-consumer")
-        .map(new EventMapProjection)
-    val kafkaProducer = createStreamProducer()
-    dataStream.addSink(kafkaProducer).name("kafka-telemetry-unique-producer")
-    env.execute("DeduplicationFlinkJob")
-  }
 }
 
-// class DeduplicationFlinkTask extends ProcessFunction
+object DeduplicationFlinkTask {
+  val config = new DeduplicationConfig
+  def apply(): DeduplicationFlinkTask = new DeduplicationFlinkTask(config)
+  def main(args: Array[String]): Unit = {
+    DeduplicationFlinkTask.apply().process()
+  }
+}

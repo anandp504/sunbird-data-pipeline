@@ -3,6 +3,7 @@ package org.ekstep.ep.samza.reader;
 
 import org.ekstep.ep.samza.core.Logger;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -10,7 +11,10 @@ import java.util.Map;
 
 import static java.text.MessageFormat.format;
 
-public class Telemetry {
+public class Telemetry implements Serializable {
+
+    private static final long serialVersionUID = 8132821816689744470L;
+
     private Map<String, Object> map;
     private Logger logger = new Logger(this.getClass());
 
@@ -36,7 +40,7 @@ public class Telemetry {
     public <T> NullableValue<T> read(String keyPath) {
         try {
             ParentType parentMap = lastParentMap(map, keyPath);
-            return new NullableValue<T>(parentMap.<T>readChild());
+            return new NullableValue<>(parentMap.readChild());
         } catch (Exception e) {
             logger.error("", format("Couldn't get key: {0} from event:{1}", keyPath, map), e);
             return new NullableValue<T>(null);
@@ -44,7 +48,7 @@ public class Telemetry {
     }
 
     public <T> NullableValue<T> readOrDefault(String keyPath, T defaultValue) {
-        return read(keyPath).isNull() ? new NullableValue<T>(defaultValue) : read(keyPath);
+        return read(keyPath).isNull() ? new NullableValue<>(defaultValue) : read(keyPath);
     }
 
     public <T> T mustReadValue(String keyPath) throws TelemetryReaderException {
@@ -68,6 +72,8 @@ public class Telemetry {
         if (keys.length > 1) {
             for (int i = 0; i < lastIndex && parent != null; i++) {
                 Object o;
+                // System.out.println("Keypath = " + keyPath);
+                // System.out.println("Parent instance = " + parent.getClass());
                 if (parent instanceof Map) {
                     o = new ParentMap((Map<String, Object>) parent, keys[i]).readChild();
                 } else if (parent instanceof List) {
@@ -90,15 +96,13 @@ public class Telemetry {
 
     @Override
     public String toString() {
-        return "Telemetry{" +
-                "map=" + map +
-                '}';
+        return "Telemetry{" + "map=" + map + '}';
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || this.getClass() != o.getClass()) return false;
 
         Telemetry telemetry = (Telemetry) o;
 

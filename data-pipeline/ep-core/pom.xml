@@ -15,19 +15,23 @@
     <name>ep-core</name>
 
     <dependencies>
+        <!--
         <dependency>
             <groupId>org.scala-lang</groupId>
             <artifactId>scala-library</artifactId>
             <version>2.11.12</version>
         </dependency>
+        -->
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-streaming-scala_${scala.version}</artifactId>
+            <artifactId>flink-streaming-scala_2.11</artifactId>
+            <!-- <artifactId>flink-streaming-scala_${scala.version}</artifactId> -->
             <version>1.9.1</version>
         </dependency>
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-kafka_${scala.version}</artifactId>
+            <artifactId>flink-connector-kafka_2.11</artifactId>
+            <!-- <artifactId>flink-connector-kafka_${scala.version}</artifactId> -->
             <version>1.9.1</version>
         </dependency>
         <dependency>
@@ -60,15 +64,34 @@
             <artifactId>samza-kv-rocksdb_${scala.version}</artifactId>
             <version>${samza.version}</version>
         </dependency>
+        <!--
         <dependency>
             <groupId>org.ekstep.ecosystem</groupId>
             <artifactId>ep-telemetry-reader</artifactId>
             <version>0.0.3</version>
         </dependency>
+        -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.4</version>
+        </dependency>
+        <!--
+        <dependency>
+            <groupId>org.json4s</groupId>
+            <artifactId>json4s-native_${scala.version}</artifactId>
+            <version>3.6.7</version>
+        </dependency>
+        -->
+        <dependency>
+            <groupId>org.json4s</groupId>
+            <artifactId>json4s-core_${scala.version}</artifactId>
+            <version>3.6.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.json4s</groupId>
+            <artifactId>json4s-jackson_${scala.version}</artifactId>
+            <version>3.6.7</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

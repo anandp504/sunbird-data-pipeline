@@ -9,13 +9,16 @@ import java.util.Map;
 
 public abstract class Events {
 
-    protected final Telemetry telemetry;
-
+    protected Telemetry telemetry;
     protected Path path;
 
     public Events(Map<String, Object> map) {
         this.telemetry = new Telemetry(map);
-        path = new Path();
+        this.path = new Path();
+    }
+
+    public Telemetry getTelemetry() {
+        return telemetry;
     }
 
     public String getChecksum() {
@@ -35,9 +38,7 @@ public abstract class Events {
     }
 
     public String getJson() {
-        Gson gson = new Gson();
-        String json = gson.toJson(getMap());
-        return json;
+        return new Gson().toJson(getMap());
     }
 
     public String mid() {
