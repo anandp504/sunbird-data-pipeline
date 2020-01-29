@@ -82,7 +82,6 @@
             <artifactId>json4s-native_${scala.version}</artifactId>
             <version>3.6.7</version>
         </dependency>
-        -->
         <dependency>
             <groupId>org.json4s</groupId>
             <artifactId>json4s-core_${scala.version}</artifactId>
@@ -93,6 +92,7 @@
             <artifactId>json4s-jackson_${scala.version}</artifactId>
             <version>3.6.7</version>
         </dependency>
+        -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>

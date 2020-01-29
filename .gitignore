@@ -13,6 +13,7 @@ database.yml
 .idea
 tmp/
 kibana-auth/node_modules/
+dependency-reduced-pom.xml*
 
 # DevOps
 *.backup

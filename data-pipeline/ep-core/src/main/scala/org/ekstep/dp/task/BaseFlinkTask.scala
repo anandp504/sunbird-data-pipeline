@@ -4,7 +4,6 @@ import java.nio.charset.StandardCharsets
 import java.util
 
 import com.google.gson.Gson
-import org.json4s.DefaultFormats
 import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.api.java.typeutils.TypeExtractor
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer.Semantic
@@ -47,7 +46,7 @@ class ProducerStringSerializationSchema(topic: String) extends KafkaSerializatio
   private val serialVersionUID = -4284080856874185929L
 
   override def serialize(element: String, timestamp: java.lang.Long): ProducerRecord[Array[Byte], Array[Byte]] = {
-    implicit val formats: DefaultFormats = DefaultFormats
+    // implicit val formats: DefaultFormats = DefaultFormats
     new ProducerRecord[Array[Byte], Array[Byte]](topic, element.getBytes(StandardCharsets.UTF_8))
   }
 }

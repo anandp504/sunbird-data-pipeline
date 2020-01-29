@@ -1,4 +1,4 @@
-package org.ekstep.dp.flink
+package org.ekstep.dp.task
 
 import org.ekstep.dp.core.BaseJobConfig
 

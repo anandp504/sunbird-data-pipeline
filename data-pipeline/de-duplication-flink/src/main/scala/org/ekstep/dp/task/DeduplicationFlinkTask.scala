@@ -1,4 +1,4 @@
-package org.ekstep.dp.flink
+package org.ekstep.dp.task
 
 import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.api.java.typeutils.TypeExtractor
@@ -16,6 +16,7 @@ class DeduplicationFlinkTask(config: DeduplicationConfig) extends BaseFlinkTask(
 
     implicit val env: StreamExecutionEnvironment = StreamExecutionEnvironment.getExecutionEnvironment
     implicit val v3EventTypeInfo: TypeInformation[String] = TypeExtractor.getForClass(classOf[String])
+    // env.setParallelism(config.parallelism)
     env.enableCheckpointing(config.checkpointingInterval)
 
     try {
@@ -36,6 +37,7 @@ class DeduplicationFlinkTask(config: DeduplicationConfig) extends BaseFlinkTask(
         .name("kafka-telemetry-duplicate-producer")
 
       env.execute("DeduplicationFlinkJob")
+
     } catch {
       case ex: Exception =>
         ex.printStackTrace()
