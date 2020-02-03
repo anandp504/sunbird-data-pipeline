@@ -31,7 +31,7 @@ trait BaseJobConfig extends Serializable {
     val properties = new Properties()
     properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBrokerServers)
     properties.put(ProducerConfig.LINGER_MS_CONFIG, new Integer(10))
-    properties.put(ProducerConfig.BUFFER_MEMORY_CONFIG, new Integer(67108864))
+    // properties.put(ProducerConfig.BUFFER_MEMORY_CONFIG, new Integer(67108864))
     properties.put(ProducerConfig.BATCH_SIZE_CONFIG, new Integer(16384 * 4))
     properties.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, "snappy")
     properties
