@@ -8,7 +8,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-1. Download spark-2.4.3 from [spark-download](https://www.apache.org/dyn/closer.lua/spark/spark-2.4.4/spark-2.4.4-bin-hadoop2.7.tgz). 
+1. Download spark-2.4.4 from [spark-download](https://www.apache.org/dyn/closer.lua/spark/spark-2.4.4/spark-2.4.4-bin-hadoop2.7.tgz). 
 2. export SPARK_HOME=`SPARK_EXTRACTED_DIR` either in .bashrc or current execution shell.
 4. Docker installed.
 5. A running yarn cluster or a kubernetes cluster.
