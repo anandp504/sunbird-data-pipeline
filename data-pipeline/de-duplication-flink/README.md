@@ -62,5 +62,5 @@ kubectl delete service/flink-jobmanager
 kubectl delete configmaps/flink-config
 
 # Command to stop the single-node cluster
-k3d stop flink-cluster
+k3d stop --name="flink-cluster"
 ```
