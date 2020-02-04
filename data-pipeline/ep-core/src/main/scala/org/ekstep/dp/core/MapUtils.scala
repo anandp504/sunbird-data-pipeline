@@ -2,6 +2,7 @@ package org.ekstep.dp.core
 
 object MapUtils {
 
+  /*
   def toJavaMap(m: Any): AnyRef = {
     import java.util
     import scala.collection.JavaConverters._
@@ -11,5 +12,6 @@ object MapUtils {
       case _ => m.asInstanceOf[AnyRef]
     }
   }
+  */
 
 }

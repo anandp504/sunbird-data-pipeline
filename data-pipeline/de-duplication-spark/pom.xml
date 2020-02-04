@@ -15,10 +15,10 @@
     </parent>
 
     <groupId>org.ekstep.ecosystem.jobs</groupId>
-    <artifactId>de-duplication-flink</artifactId>
+    <artifactId>de-duplication-spark</artifactId>
     <version>0.0.1</version>
     <packaging>jar</packaging>
-    <name>DeduplicationFlink</name>
+    <name>DeduplicationSpark</name>
     <description>
        Identifying Duplicate Events
     </description>
@@ -34,60 +34,11 @@
     -->
 
     <dependencies>
-        <!--
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
-            <version>${scala.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-streaming-scala_${scala.maj.version}</artifactId>
-            <version>1.9.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-kafka_${scala.maj.version}</artifactId>
-            <version>1.9.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka_2.11</artifactId>
-            <version>${kafka.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.schwering</groupId>
-            <artifactId>irclib</artifactId>
-            <version>1.10</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.15</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.15</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jackson</groupId>
-            <artifactId>jackson-jaxrs</artifactId>
-            <version>1.9.13</version>
-        </dependency>
-        -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.9</version>
         </dependency>
-        <!--
-        <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-hdfs</artifactId>
-            <version>2.4.0</version>
-        </dependency>
-        -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -171,6 +122,7 @@
                                     <exclude>org.apache.samza:samza-kv-rocksdb_2.11</exclude>
                                     <exclude>org.apache.samza:samza-log4j</exclude>
                                     <exclude>org.apache.hadoop:hadoop-hdfs</exclude>
+                                    <exclude>org.apache.flink.*</exclude>
                                 </excludes>
                             </artifactSet>
                             <filters>

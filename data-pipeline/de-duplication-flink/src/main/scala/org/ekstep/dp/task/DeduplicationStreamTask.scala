@@ -6,9 +6,9 @@ import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
 import org.apache.flink.streaming.api.scala.OutputTag
 import org.ekstep.dp.functions.DuplicateEventMonitor
-import org.ekstep.dp.task.BaseFlinkTask
+import org.ekstep.dp.task.BaseStreamTask
 
-class DeduplicationFlinkTask(config: DeduplicationConfig) extends BaseFlinkTask(config) {
+class DeduplicationStreamTask(config: DeduplicationConfig) extends BaseStreamTask(config) {
 
   private val serialVersionUID = 146697324640926024L
 
@@ -27,6 +27,9 @@ class DeduplicationFlinkTask(config: DeduplicationConfig) extends BaseFlinkTask(
         env.addSource(kafkaConsumer, "kafka-telemetry-valid-consumer")
           .process(new DuplicateEventMonitor(config))
 
+      /**
+        * Separate sinks for duplicate events and unique events
+        */
       dataStream.getSideOutput(new OutputTag[String]("unique-event"))
         .addSink(createStreamProducer(config.taskOutputSuccessTopic))
         .name("kafka-telemetry-unique-producer")
@@ -46,10 +49,10 @@ class DeduplicationFlinkTask(config: DeduplicationConfig) extends BaseFlinkTask(
 
 }
 
-object DeduplicationFlinkTask {
+object DeduplicationStreamTask {
   val config = new DeduplicationConfig
-  def apply(): DeduplicationFlinkTask = new DeduplicationFlinkTask(config)
+  def apply(): DeduplicationStreamTask = new DeduplicationStreamTask(config)
   def main(args: Array[String]): Unit = {
-    DeduplicationFlinkTask.apply().process()
+    DeduplicationStreamTask.apply().process()
   }
 }
