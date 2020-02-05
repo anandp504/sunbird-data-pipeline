@@ -77,7 +77,7 @@ Change the following parameters in the [submit_job.sh bash script](https://githu
     curl -Lo <spark_2.4.4_extracted_dir>/jars/kubernetes-model-4.4.2.jar https://repo1.maven.org/maven2/io/fabric8/kubernetes-client/4.4.2/kubernetes-model-4.4.2.jar
 
     # Copy the de-duplication-spark-0.0.1.jar from the spark-streaming job build 
-    target directory to the <spark_2.4.4_extracted_dir>
+    # target directory to the <spark_2.4.4_extracted_dir>
 
     # Add the following line after COPY ${spark_jars} /opt/spark/jars in 
     # <spark_2.4.4_extracted_dir>/kubernetes/dockerfiles/spark/Dockerfile. 
@@ -87,7 +87,7 @@ Change the following parameters in the [submit_job.sh bash script](https://githu
     COPY de-duplication-spark-0.0.1.jar /opt/spark/jars
 
     # Use the docker-image-tool.sh within the spark distribution binary to 
-    build a docker image. I have give a tag with just the spark version in this case.
+    # build a docker image. I have give a tag with just the spark version in this case.
 
     ./bin/docker-image-tool.sh -t 2.4.4 -f kubernetes/dockerfiles/spark/Dockerfile build
 
@@ -112,8 +112,8 @@ Change the following parameters in the [submit_job.sh bash script](https://githu
     k3d create --server-arg --no-deploy --server-arg traefik --registry-name registry.local --registry-port 5000 --enable-registry --name spark-cluster --workers=2 --image rancher/k3s:v1.0.0
 
     # Create a separate namespace and also a service account spark. This service 
-    account will be given a clusterrole edit. This step is necessary for the 
-    spark-job-driver to create a new pod to run the executor.
+    # account will be given a clusterrole edit. This step is necessary for the 
+    # spark-job-driver to create a new pod to run the executor.
 
     export KUBECONFIG="$(k3d get-kubeconfig --name='spark-cluster')"
     kubectl create namespace spark-namespace
