@@ -12,7 +12,7 @@ class DeduplicationStreamTask(config: DeduplicationConfig) extends BaseStreamTas
 
   def process() = {
 
-    val sparkConf = new SparkConf().setMaster(config.sparkTaskMaster).setAppName("DeduplicationSparkTask")
+    val sparkConf = new SparkConf().setAppName("DeduplicationSparkTask")
     implicit val streamingContext: StreamingContext = new StreamingContext(sparkConf, Seconds(config.sparkMicroBatchingInterval))
 
     try {

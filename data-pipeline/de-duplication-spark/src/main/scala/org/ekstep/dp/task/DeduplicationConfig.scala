@@ -8,7 +8,7 @@ class DeduplicationConfig extends BaseJobConfig {
 
   private val serialVersionUID = 2905979434303791379L
 
-  val sparkTaskMaster: String = config.getString("task.master")
+  // val sparkTaskMaster: String = config.getString("task.master")
   val sparkMicroBatchingInterval: Int = config.getInt("task.microbatch.interval")
 
   val dedupStore: Int = config.getInt("redis.database.duplicationstore.id")

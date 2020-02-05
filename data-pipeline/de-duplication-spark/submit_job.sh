@@ -1,15 +1,24 @@
 #!/bin/bash
 export app="org.ekstep.dp.task.DeduplicationStreamTask"
+export SPARK_KUBERNETES_IMAGE=registry.local:5000/de-duplication-spark:0.0.1
+
 spark_ui_port=4040
 network_timeout=300s
-JOB_JAR=/Users/anand/Documents/sunbird-source/sunbird-data-pipeline/data-pipeline/de-duplication-spark/target/de-duplication-spark-0.0.1.jar
+# JOB_JAR=local:///Users/anand/Documents/sunbird-source/sunbird-data-pipeline/data-pipeline/de-duplication-spark/target/de-duplication-spark-0.0.1.jar
+JOB_JAR=local:///opt/spark/jars/de-duplication-spark-0.0.1.jar
+#master=local\[*\]
+export master=k8s://https://localhost:6443
+export DRIVER_NAME="dedup-spark-job-driver"
+export DRIVER_PORT=35000
+export NAMESPACE=spark-namespace
+export SERVICE_ACCOUNT_NAME=spark
 
 # default to 1G for driver memory
-driver_memory="${driver_memory:-"1G"}"
-# default number of executors to 4
-# num_executors="${num_executors:-"4"}"
-# default executor memory to 2G
-# executor_memory="${executor_memory:-"2G"}"
+driver_memory="${driver_memory:-"512m"}"
+# default number of executors to 1
+num_executors="${num_executors:-"1"}"
+# default executor memory to 1G
+executor_memory="${executor_memory:-"512m"}"
 # default executor memory overhead to 1G
 # executor_memory_overhead="${executor_memory_overhead:-"1024"}"
 # default to use 40% of executor memory for storage
@@ -27,20 +36,24 @@ executor_conf=(
   "--conf" "spark.shuffle.memoryFraction=${shuffle_memory_fraction}"
   "--conf" "spark.executor.extraJavaOptions=${javaopts} -Dlog4j.configuration=file://${log4j}"
   # "--conf" "spark.yarn.executor.memoryOverhead=${executor_memory_overhead}"
-  # "--conf" "spark.executor.memory=${executor_memory}"
+  "--conf" "spark.executor.memory=${executor_memory}"
 )
 
 set -x
 "${SPARK_HOME}/bin/spark-submit" \
-  --master local\[*\] \
+  --master ${master} \
+  --deploy-mode cluster \
   --verbose \
-  --conf spark.ui.port="${spark_ui_port}" \
   --conf spark.port.maxRetries=10 \
-  --conf spark.serializer=org.apache.spark.serializer.KryoSerializer \
   --conf spark.rdd.compress=true \
   --conf spark.network.timeout="${network_timeout:-"300s"}" \
+  --conf spark.kubernetes.container.image=${SPARK_KUBERNETES_IMAGE} \
+  --conf spark.kubernetes.driver.pod.name=${DRIVER_NAME} \
+  --conf spark.kubernetes.authenticate.driver.serviceAccountName=${SERVICE_ACCOUNT_NAME}  \
+  --conf spark.kubernetes.namespace=${NAMESPACE} \
+  --conf spark.executor.instances=1 \
   "${executor_conf[@]}" \
   --driver-java-options "${javaopts}" \
   --driver-memory "${driver_memory}" \
   --class "${app}" \
-  "${JOB_JAR}"
+  "${JOB_JAR}" "${@}"
