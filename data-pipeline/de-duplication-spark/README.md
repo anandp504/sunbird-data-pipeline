@@ -26,7 +26,7 @@ Change the following parameters in the [submit_job.sh bash script](https://githu
 1. JOB_JAR: Location of the binary de-duplication-spark.jar file
 2. Change driver_memory, storage_memory_fraction and shuffle_memory_fraction according to the data requirements.
 
-```
+```bash
 ./submit_job.sh
 ```
 
@@ -38,7 +38,7 @@ Change the following parameters in the [submit_job.sh bash script](https://githu
 2. --master yarn
 3. Change driver_memory, storage_memory_fraction and shuffle_memory_fraction according to the data requirements.
 
-```
+```bash
 ./submit_job.sh
 ```
 
@@ -58,10 +58,10 @@ Change the following parameters in the [submit_job.sh bash script](https://githu
     <host_ip>	registry.local
 
     # We will need to build a docker image with Spark and the application jar. 
-    Follow the steps mentioned below to build a docker image.
+    # Follow the steps mentioned below to build a docker image.
 
     # spark-2.4.4 comes with kubernetes model and client jar version 4.1.2. 
-    However, there is a bug which throws the following exception:
+    # However, there is a bug which throws the following exception:
 
     io.fabric8.kubernetes.client.KubernetesClientException: 
       at io.fabric8.kubernetes.client.dsl.internal.WatchConnectionManager$2.onFailure(WatchConnectionManager.java:188)
