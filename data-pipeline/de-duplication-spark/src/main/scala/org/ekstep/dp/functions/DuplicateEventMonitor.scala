@@ -22,11 +22,11 @@ class DuplicateEventMonitor(config: DeduplicationConfig) extends java.io.Seriali
         logger.info(s"Adding mid: ${event.mid} to Redis")
         dedupEngine.storeChecksum(event.mid)
         event.markSuccess()
-        kafkaSink.value.send(config.taskOutputSuccessTopic, event.getJson)
+        kafkaSink.value.send(config.kafkaSuccessTopic, event.getJson)
       }
     } else {
       event.markSuccess()
-      kafkaSink.value.send(config.taskOutputSuccessTopic, event.getJson)
+      kafkaSink.value.send(config.kafkaSuccessTopic, event.getJson)
     }
   }
 

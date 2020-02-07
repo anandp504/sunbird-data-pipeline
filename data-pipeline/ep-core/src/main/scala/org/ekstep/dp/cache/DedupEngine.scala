@@ -19,13 +19,13 @@ class DedupEngine(redisConnect: RedisConnect, store: Int, expirySeconds: Int) ex
     catch {
       case ex: JedisException =>
         ex.printStackTrace()
+        val redisConn = redisConnect.getConnection(this.store)
         try {
-          val redisConn = redisConnect.getConnection(this.store)
-          try {
-            this.redisConnection = redisConn
-            this.redisConnection.select(store)
-            unique = !redisConnection.exists(checksum)
-          } finally if (redisConn != null) redisConn.close()
+          this.redisConnection = redisConn
+          this.redisConnection.select(store)
+          unique = !redisConnection.exists(checksum)
+        } finally {
+          if (redisConn != null) redisConn.close()
         }
     }
     unique
@@ -38,13 +38,13 @@ class DedupEngine(redisConnect: RedisConnect, store: Int, expirySeconds: Int) ex
     catch {
       case ex: JedisException =>
         ex.printStackTrace()
+        val redisConn = redisConnect.getConnection(this.store)
         try {
-          val redisConn = redisConnect.getConnection(this.store)
-          try {
-            this.redisConnection = redisConn
-            this.redisConnection.select(store)
-            redisConnection.setex(checksum, expirySeconds, "")
-          } finally if (redisConn != null) redisConn.close()
+          this.redisConnection = redisConn
+          this.redisConnection.select(store)
+          redisConnection.setex(checksum, expirySeconds, "")
+        } finally {
+          if (redisConn != null) redisConn.close()
         }
     }
   }

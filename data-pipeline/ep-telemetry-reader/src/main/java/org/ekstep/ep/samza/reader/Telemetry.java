@@ -1,7 +1,9 @@
 package org.ekstep.ep.samza.reader;
 
 
-import org.ekstep.ep.samza.core.Logger;
+// import org.ekstep.ep.samza.core.Logger;
+
+import org.ekstep.ep.samza.util.Logger;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;

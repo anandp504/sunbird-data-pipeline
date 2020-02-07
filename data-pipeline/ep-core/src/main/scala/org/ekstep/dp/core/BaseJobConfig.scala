@@ -15,8 +15,6 @@ trait BaseJobConfig extends Serializable {
   val kafkaBrokerServers: String = config.getString("kafka.broker-servers")
   val zookeeper: String = config.getString("kafka.zookeeper")
   val groupId: String = config.getString("kafka.groupId")
-  val taskInputTopics: String = config.getString("kafka.input.topics")
-  val taskOutputSuccessTopic: String = config.getString("kafka.output.success.topic")
   val checkpointingInterval: Int = config.getInt("task.checkpointing.interval")
 
   val parallelism: Int = config.getInt("task.parallelism")

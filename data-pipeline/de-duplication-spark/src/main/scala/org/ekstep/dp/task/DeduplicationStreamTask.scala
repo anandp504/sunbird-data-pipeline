@@ -16,7 +16,7 @@ class DeduplicationStreamTask(config: DeduplicationConfig) extends BaseStreamTas
     implicit val streamingContext: StreamingContext = new StreamingContext(sparkConf, Seconds(config.sparkMicroBatchingInterval))
 
     try {
-      val kafkaConsumerStream = createSparkStreamConsumer(config.taskInputTopics)
+      val kafkaConsumerStream = createSparkStreamConsumer(config.kafkaInputTopic)
       kafkaConsumerStream.foreachRDD(rdd => rdd.map(record => println(record.value())))
 
       implicit val kafkaSink: Broadcast[KafkaSink]

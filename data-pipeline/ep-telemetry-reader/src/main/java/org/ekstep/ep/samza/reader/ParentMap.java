@@ -1,8 +1,10 @@
 package org.ekstep.ep.samza.reader;
 
+import org.ekstep.ep.samza.util.Logger;
+
 import java.util.Map;
 
-import org.ekstep.ep.samza.core.Logger;
+// import org.ekstep.ep.samza.core.Logger;
 
 class ParentMap implements ParentType {
     static Logger LOGGER = new Logger(ParentMap.class);

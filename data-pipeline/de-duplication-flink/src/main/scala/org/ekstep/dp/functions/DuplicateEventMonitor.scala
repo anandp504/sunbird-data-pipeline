@@ -28,7 +28,7 @@ class DuplicateEventMonitor(config: DeduplicationConfig)(implicit val eventTypeI
                                out: Collector[String]): Unit = {
     val event = new Event(inEvent)
     val duplicationCheckRequired = isDuplicateCheckRequired(event)
-    if(duplicationCheckRequired) {
+    if (duplicationCheckRequired) {
       if (!dedupEngine.isUniqueEvent(event.mid)) {
         logger.info(s"Duplicate Event mid: ${event.mid}")
         event.markDuplicate()

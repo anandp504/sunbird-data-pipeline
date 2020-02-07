@@ -37,6 +37,12 @@
             <artifactId>spark-streaming_2.11</artifactId>
             <version>2.4.4</version>
             <scope>compile</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-log4j12</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
@@ -52,16 +58,34 @@
             <groupId>org.apache.samza</groupId>
             <artifactId>samza-core_${scala.version}</artifactId>
             <version>${samza.version}</version>
+            <exclusions>
+              <exclusion>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+              </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.samza</groupId>
             <artifactId>samza-yarn_${scala.version}</artifactId>
             <version>${samza.version}</version>
+            <exclusions>
+              <exclusion>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+              </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.samza</groupId>
             <artifactId>samza-kafka_${scala.version}</artifactId>
             <version>${samza.version}</version>
+            <exclusions>
+              <exclusion>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-log4j12</artifactId>
+              </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.samza</groupId>
@@ -73,13 +97,11 @@
             <artifactId>samza-kv-rocksdb_${scala.version}</artifactId>
             <version>${samza.version}</version>
         </dependency>
-        <!--
         <dependency>
             <groupId>org.ekstep.ecosystem</groupId>
             <artifactId>ep-telemetry-reader</artifactId>
             <version>0.0.3</version>
         </dependency>
-        -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>

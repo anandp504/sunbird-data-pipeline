@@ -15,6 +15,7 @@ import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming.dstream.InputDStream
 import org.apache.spark.streaming.kafka010.{ConsumerStrategies, KafkaUtils, LocationStrategies}
 import org.ekstep.dp.core.BaseJobConfig
+import org.ekstep.ep.samza.events.domain.Events
 
 import scala.collection.JavaConverters._
 
@@ -27,6 +28,11 @@ abstract class BaseStreamTask(config: BaseJobConfig) extends Serializable {
   def createStreamProducer(kafkaTopic: String): FlinkKafkaProducer[String] = {
     new FlinkKafkaProducer(kafkaTopic,
       new ProducerStringSerializationSchema(kafkaTopic), config.kafkaProducerProperties, Semantic.AT_LEAST_ONCE)
+  }
+
+  def createObjectStreamProducer[T <: Events](kafkaTopic: String)(implicit m: Manifest[T]): FlinkKafkaProducer[T] = {
+    new FlinkKafkaProducer[T](kafkaTopic,
+      new ProducerV3EventSerializationSchema[T](kafkaTopic), config.kafkaProducerProperties, Semantic.AT_LEAST_ONCE)
   }
 
   def createSparkStreamConsumer(kafkaTopic: String)(implicit streamingContext: StreamingContext)
@@ -90,6 +96,13 @@ class ProducerStringSerializationSchema(topic: String) extends KafkaSerializatio
   override def serialize(element: String, timestamp: java.lang.Long): ProducerRecord[Array[Byte], Array[Byte]] = {
     // implicit val formats: DefaultFormats = DefaultFormats
     new ProducerRecord[Array[Byte], Array[Byte]](topic, element.getBytes(StandardCharsets.UTF_8))
+  }
+}
+
+class ProducerV3EventSerializationSchema[T <: Events: Manifest](topic: String) extends KafkaSerializationSchema[T] {
+  private val serialVersionUID = -4284080856874185929L
+  override def serialize(element: T, timestamp: java.lang.Long): ProducerRecord[Array[Byte], Array[Byte]] = {
+    new ProducerRecord[Array[Byte], Array[Byte]](topic, element.getJson.getBytes(StandardCharsets.UTF_8))
   }
 }
 

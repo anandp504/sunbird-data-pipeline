@@ -6,7 +6,6 @@ import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
 import org.apache.flink.streaming.api.scala.OutputTag
 import org.ekstep.dp.functions.DuplicateEventMonitor
-import org.ekstep.dp.task.BaseStreamTask
 
 class DeduplicationStreamTask(config: DeduplicationConfig) extends BaseStreamTask(config) {
 
@@ -20,7 +19,7 @@ class DeduplicationStreamTask(config: DeduplicationConfig) extends BaseStreamTas
     env.enableCheckpointing(config.checkpointingInterval)
 
     try {
-      val kafkaConsumer = createStreamConsumer(config.taskInputTopics)
+      val kafkaConsumer = createStreamConsumer(config.kafkaInputTopic)
       kafkaConsumer.setStartFromEarliest()
 
       val dataStream: SingleOutputStreamOperator[String] =
@@ -31,7 +30,7 @@ class DeduplicationStreamTask(config: DeduplicationConfig) extends BaseStreamTas
         * Separate sinks for duplicate events and unique events
         */
       dataStream.getSideOutput(new OutputTag[String]("unique-event"))
-        .addSink(createStreamProducer(config.taskOutputSuccessTopic))
+        .addSink(createStreamProducer(config.kafkaSuccessTopic))
         .name("kafka-telemetry-unique-producer")
 
       // duplicateStream.getSideOutput(new OutputTag[V3Event]("duplicate-event")).print()

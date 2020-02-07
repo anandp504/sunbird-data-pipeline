@@ -1,11 +1,12 @@
 package org.ekstep.ep.samza.reader;
 
+import org.ekstep.ep.samza.util.Logger;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.List;
 import java.util.Map;
 
-import org.ekstep.ep.samza.core.Logger;
+// import org.ekstep.ep.samza.core.Logger;
 
 class ParentListOfMap implements ParentType {
     //TODO#: Make this class more genic.
