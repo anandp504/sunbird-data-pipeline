@@ -1,6 +1,7 @@
 package org.ekstep.dp.util
 
 import java.io.{File, IOException}
+import java.nio.file.{FileSystems, Files, Path, Paths}
 
 import com.github.fge.jackson.JsonLoader
 import com.github.fge.jsonschema.core.report.ProcessingReport
@@ -12,6 +13,8 @@ import org.ekstep.dp.task.PipelinePreprocessorConfig
 import org.slf4j.LoggerFactory
 
 import scala.collection.mutable
+import scala.collection.JavaConverters._
+import scala.util.Try
 
 class SchemaValidator(config: PipelinePreprocessorConfig) extends java.io.Serializable {
 
@@ -23,19 +26,37 @@ class SchemaValidator(config: PipelinePreprocessorConfig) extends java.io.Serial
   private val schemaJsonMap: Map[String, JsonSchema] = {
     val schamaMap = new mutable.HashMap[String, JsonSchema]()
     val schemaFactory = JsonSchemaFactory.byDefault
-    val schemaUrl = this.getClass.getClassLoader.getResource(s"${config.schemaPath}")
-    val schemaFiles = new File(schemaUrl.getPath).listFiles
+    val schemaUrl = this.getClass.getClassLoader.getResource(s"${config.schemaPath}").toURI
+
+    val schemaFiles = if (schemaUrl.getScheme.equalsIgnoreCase("jar")) {
+      val fileSystem = FileSystems.newFileSystem(schemaUrl, Map[String, AnyRef]().asJava)
+      val files = loadSchemaFiles(fileSystem.getPath(s"${config.schemaPath}"))
+      fileSystem.close()
+      files
+    } else {
+      loadSchemaFiles(Paths.get(schemaUrl))
+    }
+
+    logger.info(s"Loaded ${schemaFiles.size} telemetry schema files...")
 
     schemaFiles.map { schemaFile =>
       val schemaJson =
         new String(ByteStreams.toByteArray(
-          this.getClass.getClassLoader.getResourceAsStream(s"${config.schemaPath}/${schemaFile.getName}")
+          this.getClass.getClassLoader.getResourceAsStream(s"${config.schemaPath}/$schemaFile")
         ))
-      schamaMap += schemaFile.getName -> schemaFactory.getJsonSchema(JsonLoader.fromString(schemaJson))
+      schamaMap += schemaFile.toString -> schemaFactory.getJsonSchema(JsonLoader.fromString(schemaJson))
     }
     schamaMap.toMap
   }
+
   logger.info("Schema initialization completed for telemetry objects...")
+
+  def loadSchemaFiles(schemaDirPath: java.nio.file.Path): List[String] = {
+    val schemaFiles = Try(Files.newDirectoryStream(schemaDirPath)).map { stream =>
+      stream.iterator().asScala.toList.map(path => path.getFileName.toString)
+    }.getOrElse(List[String]())
+    schemaFiles
+  }
 
   def schemaFileExists(event: Event): Boolean = schemaJsonMap.contains(event.schemaName)
 

@@ -36,16 +36,16 @@ class PipelinePreprocessorStreamTask(config: PipelinePreprocessorConfig) extends
       val duplicationStream: SingleOutputStreamOperator[Event] =
         validtionStream.getSideOutput(new OutputTag[Event]("valid-events"))
           .process(new DeduplicationFunction(config)).name("Deduplication")
+          .setParallelism(2)
+
+      duplicationStream.getSideOutput(new OutputTag[Event]("duplicate-events"))
+        .addSink(createObjectStreamProducer[Event](config.kafkaDuplicateTopic))
+        .name("kafka-telemetry-duplicate-producer")
 
       val routerStream: SingleOutputStreamOperator[Event] =
         duplicationStream.getSideOutput(new OutputTag[Event]("unique-events"))
             .process(new TelemetryRouterFunction(config)).name("Router")
 
-      /*
-      duplicationStream.getSideOutput(new OutputTag[Event]("unique-event"))
-        .addSink(createObjectStreamProducer[Event](config.kafkaSuccessTopic))
-        .name("kafka-telemetry-unique-producer")
-        */
       routerStream.getSideOutput(new OutputTag[Event]("primary-route-events"))
           .addSink(createObjectStreamProducer[Event](config.kafkaPrimaryRouteTopic))
         .name("kafka-primary-route-producer")
@@ -57,10 +57,6 @@ class PipelinePreprocessorStreamTask(config: PipelinePreprocessorConfig) extends
       routerStream.getSideOutput(new OutputTag[Event]("audit-route-events"))
         .addSink(createObjectStreamProducer[Event](config.kafkaAuditRouteTopic))
         .name("kafka-audit-route-producer")
-
-      duplicationStream.getSideOutput(new OutputTag[Event]("duplicate-events"))
-        .addSink(createObjectStreamProducer[Event](config.kafkaDuplicateTopic))
-        .name("kafka-telemetry-duplicate-producer")
 
     } catch {
       case ex: Exception =>

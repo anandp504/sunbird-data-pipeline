@@ -33,7 +33,7 @@
   </appender>
 
   <appender name="RollingAppender" class="org.apache.log4j.RollingFileAppender">
-     <param name="File" value="/data/flink_logs/pipeline-processor.log" />
+     <param name="File" value="pipeline-processor.log" />
       <param name="append" value="true" />
       <param name="maxFileSize" value="100MB" />
       <param name="maxBackupIndex" value="5" />
