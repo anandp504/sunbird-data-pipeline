@@ -24,27 +24,38 @@ class PipelinePreprocessorStreamTask(config: PipelinePreprocessorConfig) extends
       val kafkaConsumer = createStreamConsumer(config.kafkaInputTopic)
       kafkaConsumer.setStartFromEarliest()
 
+      /**
+        * Process functions
+        * 1. TelemetryValidationFunction
+        * 2. DeduplicationFunction
+        * 3. TelemetryRouterFunction
+        */
+
       val validtionStream: SingleOutputStreamOperator[Event] =
         env.addSource(kafkaConsumer, "telemetry-raw-events-consumer")
           .process(new TelemetryValidationFunction(config)).name("TelemetryValidator")
             .setParallelism(2)
-
-      validtionStream.getSideOutput(new OutputTag[Event]("validation-falied-events"))
-        .addSink(createObjectStreamProducer(config.kafkaFailedTopic))
-        .name("kafka-telemetry-invalid-events-producer")
 
       val duplicationStream: SingleOutputStreamOperator[Event] =
         validtionStream.getSideOutput(new OutputTag[Event]("valid-events"))
           .process(new DeduplicationFunction(config)).name("Deduplication")
           .setParallelism(2)
 
-      duplicationStream.getSideOutput(new OutputTag[Event]("duplicate-events"))
-        .addSink(createObjectStreamProducer[Event](config.kafkaDuplicateTopic))
-        .name("kafka-telemetry-duplicate-producer")
-
       val routerStream: SingleOutputStreamOperator[Event] =
         duplicationStream.getSideOutput(new OutputTag[Event]("unique-events"))
             .process(new TelemetryRouterFunction(config)).name("Router")
+
+      /**
+        * Sink for invalid events, duplicate events, log events, audit events and telemetry events
+        */
+
+      validtionStream.getSideOutput(new OutputTag[Event]("validation-falied-events"))
+        .addSink(createObjectStreamProducer(config.kafkaFailedTopic))
+        .name("kafka-telemetry-invalid-events-producer")
+
+      duplicationStream.getSideOutput(new OutputTag[Event]("duplicate-events"))
+        .addSink(createObjectStreamProducer[Event](config.kafkaDuplicateTopic))
+        .name("kafka-telemetry-duplicate-producer")
 
       routerStream.getSideOutput(new OutputTag[Event]("primary-route-events"))
           .addSink(createObjectStreamProducer[Event](config.kafkaPrimaryRouteTopic))
