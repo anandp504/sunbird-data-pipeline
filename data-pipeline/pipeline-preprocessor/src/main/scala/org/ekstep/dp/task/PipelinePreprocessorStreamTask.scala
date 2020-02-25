@@ -21,7 +21,7 @@ class PipelinePreprocessorStreamTask(config: PipelinePreprocessorConfig) extends
     env.enableCheckpointing(config.checkpointingInterval)
 
     try {
-      val kafkaConsumer = createStreamConsumer(config.kafkaInputTopic)
+      val kafkaConsumer = createKafkaStreamConsumer(config.kafkaInputTopic)
       kafkaConsumer.setStartFromEarliest()
 
       /**

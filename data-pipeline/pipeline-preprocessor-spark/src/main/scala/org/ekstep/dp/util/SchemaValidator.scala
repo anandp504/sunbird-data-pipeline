@@ -9,14 +9,14 @@ import com.github.fge.jsonschema.main.{JsonSchema, JsonSchemaFactory}
 import com.github.fge.jsonschema.core.exceptions.ProcessingException
 import com.google.common.io.ByteStreams
 import org.ekstep.dp.domain.Event
-import org.ekstep.dp.task.PipelinePreprocessorConfig
+import org.ekstep.dp.task.PipelinePreprocessorSparkConfig
 import org.slf4j.LoggerFactory
 
 import scala.collection.mutable
 import scala.collection.JavaConverters._
 import scala.util.Try
 
-class SchemaValidator(config: PipelinePreprocessorConfig) extends java.io.Serializable {
+class SchemaValidator(config: PipelinePreprocessorSparkConfig) extends java.io.Serializable {
 
   private val serialVersionUID = 8780940932759659175L
   private[this] val logger = LoggerFactory.getLogger(classOf[SchemaValidator])
@@ -58,7 +58,7 @@ class SchemaValidator(config: PipelinePreprocessorConfig) extends java.io.Serial
     schemaFiles
   }
 
-  def schemaFileExists(event: Event): Boolean = schemaJsonMap.contains(event.schemaName)
+  def schemaFileExists(eventSchemaName: String): Boolean = schemaJsonMap.contains(eventSchemaName)
 
   @throws[IOException]
   @throws[ProcessingException]

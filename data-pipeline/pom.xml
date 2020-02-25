@@ -32,9 +32,9 @@
 		<module>de-normalization</module>
 		<module>druid-events-validator</module>
 		<module>events-router</module>
-        <module>device-profile-updater</module>
+		<module>device-profile-updater</module>
 		<module>assessment-aggregator</module>
-        <module>user-cache-updater</module>
+		<module>user-cache-updater</module>
 		<module>content-cache-updater</module>
 		<module>de-duplication-flink</module>
 	</modules>

@@ -1,17 +1,16 @@
 package org.ekstep.dp.domain
 
 import java.util
-import java.util.HashMap
 
 import org.apache.commons.lang.StringUtils
-import org.ekstep.dp.task.PipelinePreprocessorConfig
+import org.ekstep.dp.task.PipelinePreprocessorSparkConfig
 import org.ekstep.ep.samza.events.domain.Events
 import org.joda.time.format.DateTimeFormat
 
 class Event(eventMap: util.Map[String, AnyRef]) extends Events(eventMap) {
 
   private[this] val dateFormatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZoneUTC
-  private val jobName = "PipelinePreprocessor"
+  private val jobName = "PipelinePreprocessorSpark"
 
   def schemaName: String = {
     if (eid != null) s"${eid.toLowerCase}.json"
@@ -57,7 +56,8 @@ class Event(eventMap: util.Map[String, AnyRef]) extends Events(eventMap) {
     telemetry.add("type", "events")
   }
 
-  def updateDefaults(config: PipelinePreprocessorConfig): Unit = {
+
+  def updateDefaults(config: PipelinePreprocessorSparkConfig): Unit = {
     val channelString = telemetry.read[String]("context.channel").value
     val channel = StringUtils.deleteWhitespace(channelString)
     if (channel == null || channel.isEmpty) {

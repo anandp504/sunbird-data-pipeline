@@ -19,7 +19,7 @@ class DeduplicationStreamTask(config: DeduplicationConfig) extends BaseStreamTas
     env.enableCheckpointing(config.checkpointingInterval)
 
     try {
-      val kafkaConsumer = createStreamConsumer(config.kafkaInputTopic)
+      val kafkaConsumer = createKafkaStreamConsumer(config.kafkaInputTopic)
       kafkaConsumer.setStartFromEarliest()
 
       val dataStream: SingleOutputStreamOperator[String] =
@@ -30,12 +30,12 @@ class DeduplicationStreamTask(config: DeduplicationConfig) extends BaseStreamTas
         * Separate sinks for duplicate events and unique events
         */
       dataStream.getSideOutput(new OutputTag[String]("unique-event"))
-        .addSink(createStreamProducer(config.kafkaSuccessTopic))
+        .addSink(createKafkaStreamProducer(config.kafkaSuccessTopic))
         .name("kafka-telemetry-unique-producer")
 
       // duplicateStream.getSideOutput(new OutputTag[V3Event]("duplicate-event")).print()
       dataStream.getSideOutput(new OutputTag[String]("duplicate-event"))
-        .addSink(createStreamProducer(config.kafkaDuplicateTopic))
+        .addSink(createKafkaStreamProducer(config.kafkaDuplicateTopic))
         .name("kafka-telemetry-duplicate-producer")
 
       env.execute("DeduplicationFlinkJob")

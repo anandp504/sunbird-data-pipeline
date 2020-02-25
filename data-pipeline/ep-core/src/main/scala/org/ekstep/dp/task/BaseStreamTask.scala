@@ -21,11 +21,11 @@ import scala.collection.JavaConverters._
 
 abstract class BaseStreamTask(config: BaseJobConfig) extends Serializable {
 
-  def createStreamConsumer(kafkaTopic: String): FlinkKafkaConsumer[util.Map[String, AnyRef]] = {
+  def createKafkaStreamConsumer(kafkaTopic: String): FlinkKafkaConsumer[util.Map[String, AnyRef]] = {
     new FlinkKafkaConsumer[util.Map[String, AnyRef]](kafkaTopic, new ConsumerStringDeserializationSchema, config.kafkaConsumerProperties)
   }
 
-  def createStreamProducer(kafkaTopic: String): FlinkKafkaProducer[String] = {
+  def createKafkaStreamProducer(kafkaTopic: String): FlinkKafkaProducer[String] = {
     new FlinkKafkaProducer(kafkaTopic,
       new ProducerStringSerializationSchema(kafkaTopic), config.kafkaProducerProperties, Semantic.AT_LEAST_ONCE)
   }
@@ -99,10 +99,13 @@ class ProducerStringSerializationSchema(topic: String) extends KafkaSerializatio
   }
 }
 
-class ProducerV3EventSerializationSchema[T <: Events: Manifest](topic: String) extends KafkaSerializationSchema[T] {
+class ProducerV3EventSerializationSchema[T <: Events : Manifest](topic: String, key: Option[String] = None) extends KafkaSerializationSchema[T] {
   private val serialVersionUID = -4284080856874185929L
+
   override def serialize(element: T, timestamp: java.lang.Long): ProducerRecord[Array[Byte], Array[Byte]] = {
-    new ProducerRecord[Array[Byte], Array[Byte]](topic, element.getJson.getBytes(StandardCharsets.UTF_8))
+    key.map { kafkaKey =>
+      new ProducerRecord[Array[Byte], Array[Byte]](topic, kafkaKey.getBytes(StandardCharsets.UTF_8), element.getJson.getBytes(StandardCharsets.UTF_8))
+    }.getOrElse(new ProducerRecord[Array[Byte], Array[Byte]](topic, element.getJson.getBytes(StandardCharsets.UTF_8)))
   }
 }
 

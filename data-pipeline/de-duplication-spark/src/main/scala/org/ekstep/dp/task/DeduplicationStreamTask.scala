@@ -4,7 +4,7 @@ import org.apache.spark.SparkConf
 import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.ekstep.dp.domain.Event
-import org.ekstep.dp.functions.DuplicateEventMonitor
+import org.ekstep.dp.functions.DeduplicationFunction
 
 class DeduplicationStreamTask(config: DeduplicationConfig) extends BaseStreamTask(config) {
 
@@ -21,7 +21,7 @@ class DeduplicationStreamTask(config: DeduplicationConfig) extends BaseStreamTas
 
       implicit val kafkaSink: Broadcast[KafkaSink]
         = streamingContext.sparkContext.broadcast(createSparkStreamProducer())
-      val duplicateMonitor = new DuplicateEventMonitor(config)
+      val duplicateMonitor = new DeduplicationFunction(config)
 
       kafkaConsumerStream.foreachRDD {
         rdd => rdd.foreach {
