@@ -1,9 +1,13 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: flink-jobmanager
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: flink
+      component: jobmanager
   template:
     metadata:
       labels:
@@ -19,15 +23,9 @@ spec:
             path: flink-conf.yaml
           - key: log4j.properties
             path: log4j.properties
-      # - name: flink-config-volume
-      #   hostPath:
-      #     path: /data/flink/conf
-      - name: flink-logs-volume
-        hostPath:
-          path: /data/flink/log
       containers:
       - name: jobmanager
-        image: flink:1.9.1-scala_2.11
+        image: flink:1.10.0-scala_2.12
         workingDir: /opt/flink
         command: ["/bin/bash", "-c", "$FLINK_HOME/bin/jobmanager.sh start;\
           while :;
@@ -51,13 +49,5 @@ spec:
         volumeMounts:
         - name: flink-config-volume
           mountPath: /opt/flink/conf
-        - name: flink-logs-volume
-          mountPath: /opt/flink/log
-      # - name: flink-config-volume
-      #   configMap:
-      #     name: flink-config
-      #     items:
-      #     - key: flink-conf.yaml
-      #       path: flink-conf.yaml
-      #     - key: log4j.properties
-      #       path: log4j.properties
+        securityContext:
+          runAsUser: 9999  # refers to user _flink_ from official flink image, change if necessary

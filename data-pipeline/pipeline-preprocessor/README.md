@@ -32,7 +32,7 @@ Flink requires memory to be allocated for both job-manager and task manager. -yj
 
 ```
 # Create a single node cluster
-k3d create --server-arg --no-deploy --server-arg traefik --name flink-cluster --image rancher/k3s:v0.9.0
+k3d create --server-arg --no-deploy --server-arg traefik --name flink-cluster --image rancher/k3s:v1.0.0
 # Export the single node cluster into KUBECONFIG in the current shell or in ~/.bashrc.
 export KUBECONFIG="$(k3d get-kubeconfig --name='flink-cluster')"
 
