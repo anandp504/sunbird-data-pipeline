@@ -1,6 +1,7 @@
 #!/bin/bash
 export app="org.ekstep.dp.task.PipelinePreprocessorSparkStreamTask"
-export SPARK_KUBERNETES_IMAGE=registry.local:5000/pipeline-preprocessor-spark:0.0.1
+# export SPARK_KUBERNETES_IMAGE=registry.local:5000/pipeline-preprocessor-spark:0.0.1
+export SPARK_KUBERNETES_IMAGE=anandp504/pipeline-preprocessor-spark:1.0
 
 spark_ui_port=4040
 network_timeout=300s
@@ -8,9 +9,10 @@ network_timeout=300s
 JOB_JAR=local:///opt/spark/jars/pipeline-preprocessor-spark-0.0.1.jar
 # master=local\[*\]
 # export master=yarn
-export master=k8s://https://localhost:6443
+# export master=k8s://https://localhost:6443
+export master=k8s://https://kube-clust-sunbird-devnew-e-d9908e-8596f01a.hcp.centralindia.azmk8s.io:443
 export DRIVER_NAME="pipeline-processor-job-driver"
-export DRIVER_PORT=35000
+export DRIVER_PORT=35001
 export NAMESPACE=spark-namespace
 export SERVICE_ACCOUNT_NAME=spark
 
@@ -19,13 +21,15 @@ driver_memory="${driver_memory:-"512m"}"
 # default number of executors to 1
 num_executors="${num_executors:-"1"}"
 # default executor memory to 1G
-executor_memory="${executor_memory:-"512m"}"
+executor_memory="${executor_memory:-"1024m"}"
 # default executor memory overhead to 1G
 # executor_memory_overhead="${executor_memory_overhead:-"1024"}"
 # default to use 40% of executor memory for storage
 storage_memory_fraction="${storage_memory_fraction:-"0.4"}"
 # default to use 60% of executor memory for shuffle
 shuffle_memory_fraction="${shuffle_memory_fraction:-"0.6"}"
+# spark default parallelism
+spark_default_parallelism="${spark_default_parallelism:-"2"}"
 
 #log4j="${LIB_JAR_PATH}/log4j.properties"
 log4j="log4j.properties"
@@ -38,6 +42,7 @@ executor_conf=(
   "--conf" "spark.executor.extraJavaOptions=${javaopts} -Dlog4j.configuration=file://${log4j}"
   # "--conf" "spark.yarn.executor.memoryOverhead=${executor_memory_overhead}"
   "--conf" "spark.executor.memory=${executor_memory}"
+  "--conf" "spark.default.parallelism=${spark_default_parallelism}"
 )
 
 # yarn

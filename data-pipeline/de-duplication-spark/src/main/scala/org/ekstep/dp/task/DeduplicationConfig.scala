@@ -10,6 +10,7 @@ class DeduplicationConfig extends BaseJobConfig {
 
   // val sparkTaskMaster: String = config.getString("task.master")
   val sparkMicroBatchingInterval: Int = config.getInt("task.microbatch.interval")
+  val taskParallelism: Int = config.getInt("task.parallelism")
 
   val dedupStore: Int = config.getInt("redis.database.duplicationstore.id")
   val cacheExpirySeconds: Int = config.getInt("redis.database.key.expiry.seconds")

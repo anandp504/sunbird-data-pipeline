@@ -17,12 +17,13 @@ class DeduplicationStreamTask(config: DeduplicationConfig) extends BaseStreamTas
 
     try {
       val kafkaConsumerStream = createSparkStreamConsumer(config.kafkaInputTopic)
-      kafkaConsumerStream.foreachRDD(rdd => rdd.map(record => println(record.value())))
+      // kafkaConsumerStream.foreachRDD(rdd => rdd.map(record => println(record.value())))
 
       implicit val kafkaSink: Broadcast[KafkaSink]
         = streamingContext.sparkContext.broadcast(createSparkStreamProducer())
       val duplicateMonitor = new DeduplicationFunction(config)
 
+      // kafkaConsumerStream.repartition(config.taskParallelism).foreachRDD {
       kafkaConsumerStream.foreachRDD {
         rdd => rdd.foreach {
             message =>

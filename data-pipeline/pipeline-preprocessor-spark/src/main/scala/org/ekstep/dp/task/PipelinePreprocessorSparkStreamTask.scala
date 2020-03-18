@@ -25,8 +25,8 @@ class PipelinePreprocessorSparkStreamTask(config: PipelinePreprocessorSparkConfi
       val telemetryRouterFunction = new TelemetryRouterFunction(config)
 
       kafkaConsumerStream
-        .flatMap { event => dedupFunction.checkDuplicate(new Event(event.value())) }
-        .flatMap { event => telemetryValidationFunction.validate(event)(kafkaSink) }
+        .flatMap { event => telemetryValidationFunction.validate(new Event(event.value))(kafkaSink) }
+        .flatMap { event => dedupFunction.checkDuplicate(event) }
         .foreachRDD { eventRdd =>
           eventRdd.foreach {
             event => telemetryRouterFunction.route(event)(kafkaSink)
