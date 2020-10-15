@@ -61,7 +61,8 @@ class DenormalizationStreamTask(config: DenormalizationConfig, kafkaConnector: F
     val denormStream =
       env.addSource(source, config.denormalizationConsumer).uid(config.denormalizationConsumer)
         .setParallelism(config.kafkaConsumerParallelism).rebalance()
-        .process(new DenormalizationFunction(config)).name(config.denormalizationFunction).uid(config.denormalizationFunction)
+        .keyBy(_.partition)
+        .process(new DenormalizationWindowFunction(config)).name(config.denormalizationFunction).uid(config.denormalizationFunction)
           .setParallelism(config.telemetryDownstreamOperatorsParallelism)
 
     denormStream.getSideOutput(config.denormEventsTag).addSink(kafkaConnector.kafkaEventSink(config.telemetryDenormOutputTopic))

@@ -164,7 +164,7 @@ class BaseProcessFunctionTestSpec extends BaseSpec with Matchers {
   }
 
   def retrieveMid(message: String): String = {
-    new Event(gson.fromJson(message, new util.HashMap[String, AnyRef]().getClass)).mid()
+    new Event(0, gson.fromJson(message, new util.HashMap[String, AnyRef]().getClass)).mid()
   }
 
 }

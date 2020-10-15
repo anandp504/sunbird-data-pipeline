@@ -95,6 +95,7 @@ class DenormalizationStreamTaskTestSpec extends BaseTestSpec {
 
     val task = new DenormalizationStreamTask(denormConfig, mockKafkaUtil)
     task.process()
+    // Thread.sleep(2000)
     DenormEventsSink.values.size should be (10)
     DenormEventsSink.values.get("mid10") should be (None)
 
@@ -112,7 +113,6 @@ class DenormalizationStreamTaskTestSpec extends BaseTestSpec {
     user1Data.get("userlogintype") should be("NA")
     
     event = DenormEventsSink.values("mid2")
-    println(event.getJson())
     event.flags().get("device_denorm").asInstanceOf[Boolean] should be (true)
     event.flags().get("user_denorm").asInstanceOf[Boolean] should be (true)
     Option(event.flags().get("dialcode_denorm")) should be (None)
@@ -251,7 +251,7 @@ class InputSource extends SourceFunction[Event] {
     val gson = new Gson()
     EventFixture.telemetrEvents.foreach(f => {
       val eventMap = gson.fromJson(f, new util.HashMap[String, Any]().getClass)
-      ctx.collect(new Event(eventMap))
+      ctx.collect(new Event(0, eventMap))
     })
   }
 

@@ -102,7 +102,7 @@ class CoreTestSpec extends BaseSpec with Matchers with MockitoSugar {
     import org.apache.kafka.clients.consumer.ConsumerRecord
     val cRecord: ConsumerRecord[Array[Byte], Array[Byte]] = new ConsumerRecord[Array[Byte], Array[Byte]](topic, partition, offset, key, value)
     stringDeSerialization.deserialize(cRecord)
-    val event = new Event(new Gson().fromJson(EventFixture.SAMPLE_EVENT_1, new util.LinkedHashMap[String, AnyRef]().getClass))
+    val event = new Event(0, new Gson().fromJson(EventFixture.SAMPLE_EVENT_1, new util.LinkedHashMap[String, AnyRef]().getClass))
     eventSerialization.serialize(event, System.currentTimeMillis())
     eventDeSerialization.getProducedType
     stringSerialization.serialize("test", System.currentTimeMillis())
@@ -170,7 +170,7 @@ class CoreTestSpec extends BaseSpec with Matchers with MockitoSugar {
 
 }
 
-class Event(eventMap: util.Map[String, Any]) extends Events(eventMap) {
+class Event(partition: Integer, eventMap: util.Map[String, Any]) extends Events(partition, eventMap) {
   def markSuccess(flagName: String): Unit = {
     telemetry.addFieldIfAbsent("flags", new util.HashMap[String, Boolean])
     telemetry.add(s"flags.$flagName", true)

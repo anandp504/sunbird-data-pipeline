@@ -10,7 +10,7 @@ import scala.collection.JavaConverters._
 import scala.collection.mutable.Map
 import scala.collection.mutable
 
-class Event(eventMap: util.Map[String, Any]) extends Events(eventMap) {
+class Event(partition: Int, eventMap: util.Map[String, Any]) extends Events(partition, eventMap) {
 
   private[this] val df = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZ").withZoneUTC
   private[this] val df2 = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSS").withZoneUTC()

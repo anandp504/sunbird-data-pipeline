@@ -6,7 +6,7 @@ import com.google.gson.Gson
 import org.sunbird.dp.core.reader.Telemetry
 import org.sunbird.dp.core.util.JSONUtil
 
-abstract class Events(val map: util.Map[String, Any]) {
+abstract class Events(val partition: Integer, val map: util.Map[String, Any]) {
 
   protected var telemetry: Telemetry = new Telemetry(map)
 
