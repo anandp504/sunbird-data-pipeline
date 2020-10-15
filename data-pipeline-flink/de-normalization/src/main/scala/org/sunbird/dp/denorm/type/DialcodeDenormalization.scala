@@ -4,7 +4,7 @@ import org.sunbird.dp.core.cache.{DataCache, RedisConnect}
 import org.sunbird.dp.core.job.Metrics
 import org.sunbird.dp.denorm.domain.Event
 import org.sunbird.dp.denorm.task.DenormalizationConfig
-import org.sunbird.dp.denorm.util.CacheData
+import org.sunbird.dp.denorm.util.{CacheData, DenormData, RedisData}
 
 class DialcodeDenormalization(config: DenormalizationConfig) {
 
@@ -13,7 +13,7 @@ class DialcodeDenormalization(config: DenormalizationConfig) {
       config.dialcodeStore, config.dialcodeFields)
   dialcodeDataCache.init()
 
-  def denormalize(event: Event, cacheData: CacheData, metrics: Metrics) = {
+  def denormalize(event: Event, cacheData: RedisData, metrics: Metrics) = {
     if (null != event.objectType() && List("dialcode", "qr").contains(event.objectType().toLowerCase())) {
       metrics.incCounter(config.dialcodeTotal)
       val dialcodeData = cacheData.dialCode.map(f => {(f._1.toLowerCase().replace("_", ""), f._2)})

@@ -19,7 +19,7 @@ import org.sunbird.dp.core.domain.EventsPath
 import redis.clients.jedis.Response
 
 case class CacheData(content: Map[String, AnyRef], collection: Map[String, AnyRef], l2data: Map[String, AnyRef], device: Map[String, AnyRef],
-  dialCode: Map[String, AnyRef], user: Map[String, AnyRef])
+  dialCode: Map[String, AnyRef], user: Map[String, AnyRef]) extends RedisData
 
 class DenormCache(val config: DenormalizationConfig, val redisConnect: RedisConnect) {
 
@@ -36,14 +36,14 @@ class DenormCache(val config: DenormalizationConfig, val redisConnect: RedisConn
   }
 
   def getDenormData(event: Event): CacheData = {
-    this.pipeline.clear();
-    val responses = scala.collection.mutable.Map[String, AnyRef]();
+    this.pipeline.clear()
+    val responses = scala.collection.mutable.Map[String, AnyRef]()
     getContentCache(event, responses)
-    getDeviceCache(event, responses);
-    getDialcodeCache(event, responses);
-    getUserCache(event, responses);
+    getDeviceCache(event, responses)
+    getDialcodeCache(event, responses)
+    getUserCache(event, responses)
     this.pipeline.sync()
-    parseResponses(responses);
+    parseResponses(responses)
   }
 
   private def getContentCache(event: Event, responses: scala.collection.mutable.Map[String, AnyRef]) {

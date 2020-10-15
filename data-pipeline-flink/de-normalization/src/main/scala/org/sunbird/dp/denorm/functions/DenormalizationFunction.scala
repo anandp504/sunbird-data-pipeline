@@ -59,7 +59,7 @@ class DenormalizationFunction(config: DenormalizationConfig)(implicit val mapTyp
       metrics.incCounter(config.eventsExpired)
     } else {
       if ("ME_WORKFLOW_SUMMARY" == event.eid() || !event.eid().contains("SUMMARY")) {
-        val cacheData = denormCache.getDenormData(event);
+        val cacheData = denormCache.getDenormData(event)
         deviceDenormalization.denormalize(event, cacheData, metrics)
         userDenormalization.denormalize(event, cacheData, metrics)
         dialcodeDenormalization.denormalize(event, cacheData, metrics)

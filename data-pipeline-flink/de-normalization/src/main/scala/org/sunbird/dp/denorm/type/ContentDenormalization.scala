@@ -5,7 +5,7 @@ import org.sunbird.dp.core.domain.EventsPath
 import org.sunbird.dp.core.job.Metrics
 import org.sunbird.dp.denorm.domain.Event
 import org.sunbird.dp.denorm.task.DenormalizationConfig
-import org.sunbird.dp.denorm.util.CacheData
+import org.sunbird.dp.denorm.util.{CacheData, DenormData, RedisData}
 
 class ContentDenormalization(config: DenormalizationConfig) {
 
@@ -14,7 +14,7 @@ class ContentDenormalization(config: DenormalizationConfig) {
       config.contentStore, config.contentFields)
   contentDataCache.init()
 
-  def denormalize(event: Event, cacheData: CacheData, metrics: Metrics) = {
+  def denormalize(event: Event, cacheData: RedisData, metrics: Metrics) = {
     val objectType = event.objectType()
     val objectId = event.objectID()
     if (!List("user", "qr", "dialcode").contains(objectType) && null != objectId) {

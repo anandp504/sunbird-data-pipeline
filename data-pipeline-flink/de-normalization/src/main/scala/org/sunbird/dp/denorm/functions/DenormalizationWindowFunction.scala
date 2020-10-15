@@ -10,7 +10,7 @@ import org.sunbird.dp.core.job.{BaseProcessFunction, BaseProcessKeyedFunction, M
 import org.sunbird.dp.denorm.`type`._
 import org.sunbird.dp.denorm.domain.Event
 import org.sunbird.dp.denorm.task.DenormalizationConfig
-import org.sunbird.dp.denorm.util.DenormCache
+import org.sunbird.dp.denorm.util.{DenormCache, DenormWindowCache}
 
 case class WindowEvents(count: Integer, key: String, value: List[Event])
 
@@ -24,7 +24,7 @@ class DenormalizationWindowFunction(config: DenormalizationConfig)(implicit val 
   private[this] var dialcodeDenormalization: DialcodeDenormalization = _
   private[this] var contentDenormalization: ContentDenormalization = _
   private[this] var locationDenormalization: LocationDenormalization = _
-  private[this] var denormCache: DenormCache = _
+  private[this] var denormCache: DenormWindowCache = _
 
   lazy val state: ValueState[WindowEvents] =
     getRuntimeContext.getState(new ValueStateDescriptor[WindowEvents]("state", classOf[WindowEvents]))
@@ -39,7 +39,7 @@ class DenormalizationWindowFunction(config: DenormalizationConfig)(implicit val 
 
   override def open(parameters: Configuration): Unit = {
     super.open(parameters)
-    denormCache = new DenormCache(config, new RedisConnect(config.metaRedisHost, config.metaRedisPort, config))
+    denormCache = new DenormWindowCache(config, new RedisConnect(config.metaRedisHost, config.metaRedisPort, config))
     denormCache.init()
     deviceDenormalization = new DeviceDenormalization(config)
     userDenormalization = new UserDenormalization(config)
@@ -60,8 +60,9 @@ class DenormalizationWindowFunction(config: DenormalizationConfig)(implicit val 
   override def onTimer(timestamp: Long, ctx: KeyedProcessFunction[Integer, Event, Event]#OnTimerContext, metrics: Metrics): Unit = {
     Option( state.value ) match {
       case None => // ignore
-      case Some( status ) => {
-        status.value.foreach { denormEvent => denormalize(denormEvent, ctx, metrics) }
+      case Some( denormEvents ) => {
+        // status.value.foreach { denormEvent => denormalize(denormEvent, ctx, metrics) }
+        denormalize(denormEvents.value, ctx, metrics)
         state.clear()
       }
     }
@@ -78,14 +79,14 @@ class DenormalizationWindowFunction(config: DenormalizationConfig)(implicit val 
 
         val updated: WindowEvents = Option(state.value) match {
           case None => {
-            // context.timerService().registerProcessingTimeTimer(context.timestamp + 5)
             WindowEvents(1, null, List(event))
           }
           case Some(currentEvent) => WindowEvents(currentEvent.count + 1, null, event :: currentEvent.value)
         }
 
         if (updated.count == 5) {
-          updated.value.foreach { denormEvent => denormalize(denormEvent, context, metrics) }
+          // updated.value.foreach { denormEvent => denormalize(denormEvent, context, metrics) }
+          denormalize(updated.value, context, metrics)
           state.clear()
         } else {
           state.update( updated )
@@ -94,14 +95,18 @@ class DenormalizationWindowFunction(config: DenormalizationConfig)(implicit val 
     }
   }
 
-  def denormalize(event: Event, context: KeyedProcessFunction[Integer, Event, Event]#Context, metrics: Metrics) = {
-    val cacheData = denormCache.getDenormData(event)
-    deviceDenormalization.denormalize(event, cacheData, metrics)
-    userDenormalization.denormalize(event, cacheData, metrics)
-    dialcodeDenormalization.denormalize(event, cacheData, metrics)
-    contentDenormalization.denormalize(event, cacheData, metrics)
-    locationDenormalization.denormalize(event, cacheData, metrics)
-    context.output(config.denormEventsTag, event)
+  def denormalize(events: List[Event], context: KeyedProcessFunction[Integer, Event, Event]#Context, metrics: Metrics) = {
+    val denormData = denormCache.getDenormData(events)
+    denormData.foreach {
+      eventDenormData =>
+        val denormEvent = events.filter(_.mid == eventDenormData.mid).head
+        deviceDenormalization.denormalize(denormEvent, eventDenormData, metrics)
+        userDenormalization.denormalize(denormEvent, eventDenormData, metrics)
+        dialcodeDenormalization.denormalize(denormEvent, eventDenormData, metrics)
+        contentDenormalization.denormalize(denormEvent, eventDenormData, metrics)
+        locationDenormalization.denormalize(denormEvent, eventDenormData, metrics)
+        context.output(config.denormEventsTag, denormEvent)
+    }
   }
 
 }

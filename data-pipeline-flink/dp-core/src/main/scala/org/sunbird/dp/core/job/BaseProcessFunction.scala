@@ -71,5 +71,5 @@ abstract class BaseProcessKeyedFunction[K, T, R](config: BaseJobConfig) extends 
   override def onTimer(timestamp: Long, ctx: KeyedProcessFunction[K, T, R]#OnTimerContext, out: Collector[R]): Unit = {
     onTimer(timestamp, ctx, metrics)
   }
-  
+
 }

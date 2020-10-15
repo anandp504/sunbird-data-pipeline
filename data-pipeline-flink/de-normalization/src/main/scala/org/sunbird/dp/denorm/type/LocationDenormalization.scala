@@ -3,11 +3,11 @@ package org.sunbird.dp.denorm.`type`
 import org.sunbird.dp.core.job.Metrics
 import org.sunbird.dp.denorm.domain.Event
 import org.sunbird.dp.denorm.task.DenormalizationConfig
-import org.sunbird.dp.denorm.util.CacheData
+import org.sunbird.dp.denorm.util.{CacheData, DenormData, RedisData}
 
 class LocationDenormalization(config: DenormalizationConfig) {
 
-  def denormalize(event: Event, cacheData: CacheData, metrics: Metrics) = {
+  def denormalize(event: Event, cacheData: RedisData, metrics: Metrics) = {
     metrics.incCounter(config.locTotal)
     val userProfileLocation = event.getUserProfileLocation()
     val userDeclaredLocation = event.getUserDeclaredLocation()

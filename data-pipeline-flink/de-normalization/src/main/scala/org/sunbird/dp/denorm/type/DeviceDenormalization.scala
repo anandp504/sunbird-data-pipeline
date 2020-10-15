@@ -4,7 +4,7 @@ import org.sunbird.dp.core.cache.{DataCache, RedisConnect}
 import org.sunbird.dp.core.job.Metrics
 import org.sunbird.dp.denorm.domain.{DeviceProfile, Event}
 import org.sunbird.dp.denorm.task.DenormalizationConfig
-import org.sunbird.dp.denorm.util.CacheData
+import org.sunbird.dp.denorm.util.{CacheData, DenormData, RedisData}
 
 class DeviceDenormalization(config: DenormalizationConfig) {
 
@@ -13,7 +13,7 @@ class DeviceDenormalization(config: DenormalizationConfig) {
       config.deviceStore, config.deviceFields)
   deviceDataCache.init()
 
-  def denormalize(event: Event, cacheData: CacheData, metrics: Metrics) = {
+  def denormalize(event: Event, cacheData: RedisData, metrics: Metrics) = {
     event.compareAndAlterEts() // Reset ets to today's date if we get future value
     val did = event.did()
     if (null != did && did.nonEmpty) {

@@ -5,8 +5,9 @@ import org.sunbird.dp.core.cache.{DataCache, RedisConnect}
 import org.sunbird.dp.core.job.Metrics
 import org.sunbird.dp.denorm.domain.Event
 import org.sunbird.dp.denorm.task.DenormalizationConfig
+
 import scala.collection.mutable
-import org.sunbird.dp.denorm.util.CacheData
+import org.sunbird.dp.denorm.util.{CacheData, DenormData, RedisData}
 
 class UserDenormalization(config: DenormalizationConfig) {
 
@@ -15,7 +16,7 @@ class UserDenormalization(config: DenormalizationConfig) {
       config.userStore, config.userFields)
   userDataCache.init()
 
-  def denormalize(event: Event, cacheData: CacheData, metrics: Metrics) = {
+  def denormalize(event: Event, cacheData: RedisData, metrics: Metrics) = {
     val actorId = event.actorId()
     val actorType = event.actorType()
     if (null != actorId && actorId.nonEmpty && !"anonymous".equalsIgnoreCase(actorId) &&
