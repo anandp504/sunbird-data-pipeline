@@ -75,7 +75,7 @@ class DenormalizationWindowFunction(config: DenormalizationConfig)(implicit val 
       metrics.incCounter(config.eventsExpired)
     } else {
       if ("ME_WORKFLOW_SUMMARY" == event.eid() || !event.eid().contains("SUMMARY")) {
-        context.timerService().registerProcessingTimeTimer(context.timestamp() + 5)
+        context.timerService().registerProcessingTimeTimer(context.timestamp() + config.windowTimeInSeconds)
 
         val updated: WindowEvents = Option(state.value) match {
           case None => {
@@ -84,7 +84,7 @@ class DenormalizationWindowFunction(config: DenormalizationConfig)(implicit val 
           case Some(currentEvent) => WindowEvents(currentEvent.count + 1, null, event :: currentEvent.value)
         }
 
-        if (updated.count == 5) {
+        if (updated.count == config.windowCount) {
           // updated.value.foreach { denormEvent => denormalize(denormEvent, context, metrics) }
           denormalize(updated.value, context, metrics)
           state.clear()
