@@ -7,6 +7,7 @@ import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.api.java.typeutils.TypeExtractor
 import org.apache.flink.api.java.utils.ParameterTool
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment
+import org.apache.flink.streaming.api.windowing.time.Time
 import org.sunbird.dp.core.job.FlinkKafkaConnector
 import org.sunbird.dp.core.util.FlinkUtil
 import org.sunbird.dp.denorm.domain.Event
@@ -61,7 +62,7 @@ class DenormalizationStreamTask(config: DenormalizationConfig, kafkaConnector: F
     val denormStream =
       env.addSource(source, config.denormalizationConsumer).uid(config.denormalizationConsumer)
         .setParallelism(config.kafkaConsumerParallelism).rebalance()
-        .keyBy(_.partition)
+        .keyBy(_.partition())
         .process(new DenormalizationWindowFunction(config)).name(config.denormalizationFunction).uid(config.denormalizationFunction)
           .setParallelism(config.telemetryDownstreamOperatorsParallelism)
 

@@ -97,7 +97,7 @@ class DenormInputSource extends SourceFunction[Event] {
     val gson = new Gson()
     EventFixture.telemetrEvents.foreach(f => {
       val eventMap = gson.fromJson(f, new util.HashMap[String, Any]().getClass)
-      ctx.collect(new Event(0, eventMap))
+      ctx.collect(new Event(eventMap))
     })
   }
 

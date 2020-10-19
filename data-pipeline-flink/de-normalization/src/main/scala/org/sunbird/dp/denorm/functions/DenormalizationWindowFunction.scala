@@ -15,7 +15,7 @@ import org.sunbird.dp.denorm.util.{DenormCache, DenormWindowCache}
 case class WindowEvents(count: Integer, key: String, value: List[Event])
 
 class DenormalizationWindowFunction(config: DenormalizationConfig)(implicit val mapTypeInfo: TypeInformation[Event])
-  extends BaseProcessKeyedFunction[Integer, Event, Event](config) {
+  extends BaseProcessKeyedFunction[Int, Event, Event](config) {
 
   private[this] val logger = LoggerFactory.getLogger(classOf[DenormalizationFunction])
 
@@ -57,11 +57,10 @@ class DenormalizationWindowFunction(config: DenormalizationConfig)(implicit val 
     contentDenormalization.closeDataCache()
   }
 
-  override def onTimer(timestamp: Long, ctx: KeyedProcessFunction[Integer, Event, Event]#OnTimerContext, metrics: Metrics): Unit = {
+  override def onTimer(timestamp: Long, ctx: KeyedProcessFunction[Int, Event, Event]#OnTimerContext, metrics: Metrics): Unit = {
     Option( state.value ) match {
       case None => // ignore
       case Some( denormEvents ) => {
-        // status.value.foreach { denormEvent => denormalize(denormEvent, ctx, metrics) }
         denormalize(denormEvents.value, ctx, metrics)
         state.clear()
       }
@@ -69,23 +68,19 @@ class DenormalizationWindowFunction(config: DenormalizationConfig)(implicit val 
   }
 
   override def processElement(event: Event,
-                              context: KeyedProcessFunction[Integer, Event, Event]#Context,
+                              context: KeyedProcessFunction[Int, Event, Event]#Context,
                               metrics: Metrics): Unit = {
     if (event.isOlder(config.ignorePeriodInMonths)) { // Skip events older than configured value (default: 3 months)
       metrics.incCounter(config.eventsExpired)
     } else {
       if ("ME_WORKFLOW_SUMMARY" == event.eid() || !event.eid().contains("SUMMARY")) {
-        context.timerService().registerProcessingTimeTimer(context.timestamp() + config.windowTimeInSeconds)
 
         val updated: WindowEvents = Option(state.value) match {
-          case None => {
-            WindowEvents(1, null, List(event))
-          }
+          case None => WindowEvents(1, null, List(event))
           case Some(currentEvent) => WindowEvents(currentEvent.count + 1, null, event :: currentEvent.value)
         }
 
         if (updated.count == config.windowCount) {
-          // updated.value.foreach { denormEvent => denormalize(denormEvent, context, metrics) }
           denormalize(updated.value, context, metrics)
           state.clear()
         } else {
@@ -93,9 +88,10 @@ class DenormalizationWindowFunction(config: DenormalizationConfig)(implicit val 
         }
       }
     }
+    context.timerService().registerProcessingTimeTimer(context.timestamp() + config.windowTimeInSeconds)
   }
 
-  def denormalize(events: List[Event], context: KeyedProcessFunction[Integer, Event, Event]#Context, metrics: Metrics) = {
+  def denormalize(events: List[Event], context: KeyedProcessFunction[Int, Event, Event]#Context, metrics: Metrics) = {
     val denormData = denormCache.getDenormData(events)
     denormData.foreach {
       eventDenormData =>

@@ -14,7 +14,7 @@ class TelemetryEventReaderSpec extends BaseSpec with Matchers with MockitoSugar 
 
   "Telemetry Reader" should "Able to read the particular key from the event" in {
 
-    val telemetryEvent = new Event(0, gson.fromJson(EventFixture.SAMPLE_EVENT_1, new util.LinkedHashMap[String, Any]().getClass))
+    val telemetryEvent = new Event(gson.fromJson(EventFixture.SAMPLE_EVENT_1, new util.LinkedHashMap[String, Any]().getClass))
     telemetryEvent.eid() should be("INTERACT")
     telemetryEvent.mid() should be("321a6f0c-10c6-4cdc-9893-207bb64fea50")
     telemetryEvent.did() should be("758e054a400f20f7677f2def76427dc13ad1f837")
@@ -37,7 +37,7 @@ class TelemetryEventReaderSpec extends BaseSpec with Matchers with MockitoSugar 
 
   it should "Able to read the default, nested and update the particular key and value" in {
     val eventMap = gson.fromJson(EventFixture.SAMPLE_EVENT_2, new util.LinkedHashMap[String, Any]().getClass)
-    val telemetryEvent = new Event(0, eventMap)
+    val telemetryEvent = new Event(eventMap)
     // read
     telemetryEvent.edataItems() should not be (null)
     telemetryEvent.edataItems().size() should be(3)

@@ -6,13 +6,15 @@ import com.google.gson.Gson
 import org.sunbird.dp.core.reader.Telemetry
 import org.sunbird.dp.core.util.JSONUtil
 
-abstract class Events(val partition: Integer, val map: util.Map[String, Any]) {
+abstract class Events(val map: util.Map[String, Any]) {
 
   protected var telemetry: Telemetry = new Telemetry(map)
 
   def getTelemetry: Telemetry = telemetry
 
   def kafkaKey(): String = mid()
+
+  def partition(): Int = telemetry.read[Int](keyPath = "partition").getOrElse(0)
 
   def getChecksum: String = {
     val checksum = id()
@@ -31,7 +33,8 @@ abstract class Events(val partition: Integer, val map: util.Map[String, Any]) {
 
 
   def did(): String = {
-    telemetry.read[String](keyPath = EventsPath.DIMENSION_DID_PATH).getOrElse(telemetry.read(keyPath = EventsPath.CONTEXT_DID_PATH).orNull)
+    telemetry.read[String](keyPath = EventsPath.DIMENSION_DID_PATH).getOrElse(telemetry.read(keyPath = EventsPath.CONTEXT_DID_PATH).getOrElse(""))
+    // "b93edf2bdf7aab1ebfff314cfb7f792959094ad3"
   }
 
   def eid(): String = telemetry.read[String](keyPath = EventsPath.EID_PATH).orNull

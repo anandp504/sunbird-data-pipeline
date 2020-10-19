@@ -21,8 +21,10 @@ class EventDeserializationSchema[T <: Events](implicit ct: ClassTag[T]) extends 
   override def deserialize(record: ConsumerRecord[Array[Byte], Array[Byte]]): T = {
     // val parsedString = new String(record.value(), StandardCharsets.UTF_8)
     // val result = new Gson().fromJson(parsedString, new util.HashMap[String, AnyRef]().getClass)
-    val result = JSONUtil.deserialize[util.HashMap[String, AnyRef]](record.value())
-    ct.runtimeClass.getConstructor(classOf[Integer], classOf[util.Map[String, AnyRef]]).newInstance(new Integer(record.partition()), result).asInstanceOf[T]
+    // val result = JSONUtil.deserialize[util.HashMap[String, AnyRef]](record.value())
+    val recordMap = JSONUtil.deserialize[util.HashMap[String, AnyRef]](record.value())
+    recordMap.put("partition",record.partition().asInstanceOf[AnyRef])
+    ct.runtimeClass.getConstructor(classOf[util.Map[String, AnyRef]]).newInstance(recordMap).asInstanceOf[T]
   }
 
   override def getProducedType: TypeInformation[T] = TypeExtractor.getForClass(classTag[T].runtimeClass).asInstanceOf[TypeInformation[T]]

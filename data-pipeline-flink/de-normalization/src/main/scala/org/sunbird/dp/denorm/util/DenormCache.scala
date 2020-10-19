@@ -3,17 +3,13 @@ package org.sunbird.dp.denorm.util
 import java.util
 import com.google.gson.Gson
 import org.slf4j.LoggerFactory
-import redis.clients.jedis.Jedis
-import redis.clients.jedis.exceptions.{ JedisConnectionException, JedisException }
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.collection.mutable.Map
-import scala.collection.immutable
 import org.sunbird.dp.core.cache.RedisConnect
 import org.sunbird.dp.denorm.domain.Event
 import redis.clients.jedis.Pipeline
-import scala.collection.mutable.ArrayBuffer
 import org.sunbird.dp.denorm.task.DenormalizationConfig
 import org.sunbird.dp.core.domain.EventsPath
 import redis.clients.jedis.Response
