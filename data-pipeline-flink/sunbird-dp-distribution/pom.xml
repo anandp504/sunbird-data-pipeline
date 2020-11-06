@@ -20,6 +20,7 @@
             <version>${flink.version}</version>
             <type>jar</type>
         </dependency>
+        <!--
         <dependency>
             <groupId>org.sunbird.dp.jobs</groupId>
             <artifactId>ingest-router</artifactId>
@@ -38,12 +39,14 @@
             <version>1.0.0</version>
             <type>jar</type>
         </dependency>
+        -->
         <dependency>
             <groupId>org.sunbird.dp.jobs</groupId>
             <artifactId>de-normalization</artifactId>
             <version>1.0.0</version>
             <type>jar</type>
         </dependency>
+        <!--
         <dependency>
             <groupId>org.sunbird.dp.jobs</groupId>
             <artifactId>druid-events-validator</artifactId>
@@ -80,6 +83,7 @@
             <version>1.0.0</version>
             <type>jar</type>
         </dependency>
+        -->
     </dependencies>
 
     <build>
@@ -122,8 +126,8 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <repository>sunbird-datapipeline</repository>
-                            <tag>${release-version}</tag>
+                            <repository>de-normalization</repository>
+                            <tag>window-batching-custom-key</tag>
                         </configuration>
                     </plugin>
                 </plugins>

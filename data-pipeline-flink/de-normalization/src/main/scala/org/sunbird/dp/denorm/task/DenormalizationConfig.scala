@@ -15,6 +15,11 @@ class DenormalizationConfig(override val config: Config, jobName: String) extend
   implicit val mapTypeInfo: TypeInformation[Event] = TypeExtractor.getForClass(classOf[Event])
   implicit val anyTypeInfo: TypeInformation[String] = TypeExtractor.getForClass(classOf[String])
 
+  // Windows
+  val windowTimeInMillis: Int = config.getInt("task.window.time")
+  val windowCount: Int = config.getInt("task.window.count")
+  val windowShards: Int = config.getInt("task.window.shards")
+
   // Kafka Topics Configuration
   val telemetryInputTopic: String = config.getString("kafka.input.telemetry.topic")
   val summaryInputTopic: String = config.getString("kafka.input.summary.topic")
@@ -31,6 +36,11 @@ class DenormalizationConfig(override val config: Config, jobName: String) extend
   val contentStore: Int = config.getInt("redis-meta.database.contentstore.id")
   val deviceStore: Int = config.getInt("redis-meta.database.devicestore.id")
   val dialcodeStore: Int = config.getInt("redis-meta.database.dialcodestore.id")
+
+  val userRedisPort: Int = config.getInt("redis-meta.user.port")
+  val deviceRedisPort: Int = config.getInt("redis-meta.device.port")
+  val contentRedisPort: Int = config.getInt("redis-meta.content.port")
+  val dialcodeRedisPort: Int = config.getInt("redis-meta.dialcode.port")
 
   val deviceFields = List("country_code", "country", "state_code", "state", "city", "district_custom", "state_code_custom",
     "state_custom", "user_declared_state", "user_declared_district", "devicespec", "firstaccess")

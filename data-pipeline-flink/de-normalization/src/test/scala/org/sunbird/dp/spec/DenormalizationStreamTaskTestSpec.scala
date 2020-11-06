@@ -43,7 +43,6 @@ class DenormalizationStreamTaskTestSpec extends BaseTestSpec {
     super.beforeAll()
     redisServer = new RedisServer(6341)
     redisServer.start()
-
     BaseMetricsReporter.gaugeMetrics.clear()
 
     setupRedisTestData()
@@ -270,6 +269,7 @@ class DenormEventsSink extends SinkFunction[Event] {
 
   override def invoke(event: Event): Unit = {
     synchronized {
+      // println(event.getJson())
       DenormEventsSink.values.put(event.mid(), event)
     }
   }

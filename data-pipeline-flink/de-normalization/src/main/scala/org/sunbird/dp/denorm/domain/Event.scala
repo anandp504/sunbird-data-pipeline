@@ -20,6 +20,10 @@ class Event(eventMap: util.Map[String, Any]) extends Events(eventMap) {
     did()
   }
 
+  override def did(): String = {
+    telemetry.read[String](keyPath = EventsPath.DIMENSION_DID_PATH).getOrElse(telemetry.read(keyPath = EventsPath.CONTEXT_DID_PATH).getOrElse(""))
+  }
+
   def addDeviceProfile(deviceProfile: DeviceProfile): Unit = {
 
     val deviceMap = new util.HashMap[String, Object]()

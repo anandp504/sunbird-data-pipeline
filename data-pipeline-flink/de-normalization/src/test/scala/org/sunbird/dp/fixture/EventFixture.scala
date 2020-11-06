@@ -141,7 +141,7 @@ object EventFixture {
        |"context":{"cdata":[],"env":"home","channel":"505c7c48ac6dc1edc9b08f21db5a571d",
        |"pdata":{"id":"sunbird.app","pid":"sunbird.app","ver":"2.3.144"},"sid":"df936f82-e982-41ec-8412-70d414458272",
        |"did":"45f32f48592cb9bcf26bef9178b7bd20abe24932"},"flags":{"dd_processed":true},
-       |"mid":"mid6","type":"events","object":{"id":"PCZKA4","type":"qr",
+       |"mid":"mid11","type":"events","object":{"id":"PCZKA4","type":"qr",
        |"version":"","rollup":{}}}""".stripMargin
             
   )

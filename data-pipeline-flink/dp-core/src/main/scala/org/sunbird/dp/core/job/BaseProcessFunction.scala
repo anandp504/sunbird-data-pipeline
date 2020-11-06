@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicLong
 
 import org.apache.flink.api.scala.metrics.ScalaGauge
 import org.apache.flink.configuration.Configuration
-import org.apache.flink.streaming.api.functions.ProcessFunction
+import org.apache.flink.streaming.api.functions.{KeyedProcessFunction, ProcessFunction}
 import org.apache.flink.util.Collector
 
 case class Metrics(metrics: ConcurrentHashMap[String, AtomicLong]) {
@@ -43,4 +43,29 @@ abstract class BaseProcessFunction[T, R](config: BaseJobConfig) extends ProcessF
   override def processElement(event: T, context: ProcessFunction[T, R]#Context, out: Collector[R]): Unit = {
     processElement(event, context, metrics)
   }
+}
+
+abstract class BaseProcessKeyedFunction[K, T, R](config: BaseJobConfig) extends KeyedProcessFunction[K, T, R] with JobMetrics {
+
+  private val metrics: Metrics = registerMetrics(metricsList())
+
+  override def open(parameters: Configuration): Unit = {
+    metricsList().map { metric =>
+      getRuntimeContext.getMetricGroup.addGroup(config.jobName)
+        .gauge[Long, ScalaGauge[Long]](metric, ScalaGauge[Long]( () => metrics.getAndReset(metric) ))
+    }
+  }
+
+  def processElement(event: T, context: KeyedProcessFunction[K, T, R]#Context, metrics: Metrics): Unit
+  def onTimer(timestamp: Long, ctx: KeyedProcessFunction[K, T, R]#OnTimerContext, metrics: Metrics): Unit = {}
+  def metricsList(): List[String]
+
+  override def processElement(event: T, context: KeyedProcessFunction[K, T, R]#Context, out: Collector[R]): Unit = {
+    processElement(event, context, metrics)
+  }
+
+  override def onTimer(timestamp: Long, ctx: KeyedProcessFunction[K, T, R]#OnTimerContext, out: Collector[R]): Unit = {
+    onTimer(timestamp, ctx, metrics)
+  }
+
 }
